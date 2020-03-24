@@ -1,0 +1,45 @@
+{
+	"multipart": 
+	[
+		{
+			"when": 
+			{
+				"lit": "true"
+			},
+			"apply": 
+			{
+				"model": "magus:block/magic_candle_on"
+			}
+		},
+		{
+			"when": 
+			{
+				"lit": "false"
+			},
+			"apply": 
+			{
+				"model": "magus:block/magic_candle_off"
+			}
+		},
+		{
+			"when": 
+			{
+				"powered": "true"
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_circle_on"
+			}
+		},
+		{
+			"when": 
+			{
+				"powered": "false"
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_circle_off"
+			}
+		}
+	]
+}

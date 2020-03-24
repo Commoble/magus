@@ -1,0 +1,419 @@
+{
+	"multipart": 
+	[
+		{
+			"when": 
+			{
+				"AND": 
+				[
+					{
+						"powered": false
+					},
+					{
+						"OR": 
+						[
+							{
+								"north": "none",
+								"east": "none",
+								"south": "none",
+								"west": "none"
+							},
+							{
+								"north": "side|up",
+								"east": "side|up"
+							},
+							{
+								"east": "side|up",
+								"south": "side|up"
+							},
+							{
+								"south": "side|up",
+								"west": "side|up"
+							},
+							{
+								"west": "side|up",
+								"north": "side|up"
+							}
+						]
+					}
+				]
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_dot_off"
+			}
+		},
+		{
+			"when": 
+			{
+				"AND": 
+				[
+					{
+						"powered": true
+					},
+					{
+						"OR": 
+						[
+							{
+								"north": "none",
+								"east": "none",
+								"south": "none",
+								"west": "none"
+							},
+							{
+								"north": "side|up",
+								"east": "side|up"
+							},
+							{
+								"east": "side|up",
+								"south": "side|up"
+							},
+							{
+								"south": "side|up",
+								"west": "side|up"
+							},
+							{
+								"west": "side|up",
+								"north": "side|up"
+							}
+						]
+					}
+				]
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_dot_on"
+			}
+		},
+		{
+			"when": 
+			{
+				"AND": 
+				[
+					{
+						"powered": false
+					},
+					{
+						"OR": 
+						[
+							{
+								"north": "side|up"
+							},
+							{
+								"north": "none",
+								"east": "none",
+								"south": "side|up",
+								"west": "none"
+							}
+						]
+					}
+				]
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_side_north_0_off"
+			}
+		},
+		{
+			"when": 
+			{
+				"AND": 
+				[
+					{
+						"powered": true
+					},
+					{
+						"OR": 
+						[
+							{
+								"north": "side|up"
+							},
+							{
+								"north": "none",
+								"east": "none",
+								"south": "side|up",
+								"west": "none"
+							}
+						]
+					}
+				]
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_side_north_0_on"
+			}
+		},
+		{
+			"when": 
+			{
+				"AND": 
+				[
+					{
+						"powered": false
+					},
+					{
+						"OR": 
+						[
+							{
+								"south": "side|up"
+							},
+							{
+								"north": "side|up",
+								"east": "none",
+								"south": "none",
+								"west": "none"
+							}
+						]
+					}
+				]
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_side_south_0_off"
+			}
+		},
+		{
+			"when": 
+			{
+				"AND": 
+				[
+					{
+						"powered": true
+					},
+					{
+						"OR": 
+						[
+							{
+								"south": "side|up"
+							},
+							{
+								"north": "side|up",
+								"east": "none",
+								"south": "none",
+								"west": "none"
+							}
+						]
+					}
+				]
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_side_south_0_on"
+			}
+		},
+		{
+			"when": 
+			{
+				"AND": 
+				[
+					{
+						"powered": false
+					},
+					{
+						"OR": 
+						[
+							{
+								"east": "side|up"
+							},
+							{
+								"north": "none",
+								"east": "none",
+								"south": "none",
+								"west": "side|up"
+							}
+						]
+					}
+				]
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_side_south_1_off",
+				"y": 270
+			}
+		},
+		{
+			"when": 
+			{
+				"AND": 
+				[
+					{
+						"powered": true
+					},
+					{
+						"OR": 
+						[
+							{
+								"east": "side|up"
+							},
+							{
+								"north": "none",
+								"east": "none",
+								"south": "none",
+								"west": "side|up"
+							}
+						]
+					}
+				]
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_side_south_1_on",
+				"y": 270
+			}
+		},
+		{
+			"when": 
+			{
+				"AND": 
+				[
+					{
+						"powered": false
+					},
+					{
+						"OR": 
+						[
+							{
+								"west": "side|up"
+							},
+							{
+								"north": "none",
+								"east": "side|up",
+								"south": "none",
+								"west": "none"
+							}
+						]
+					}
+				]
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_side_north_1_off",
+				"y": 270
+			}
+		},
+		{
+			"when": 
+			{
+				"AND": 
+				[
+					{
+						"powered": true
+					},
+					{
+						"OR": 
+						[
+							{
+								"west": "side|up"
+							},
+							{
+								"north": "none",
+								"east": "side|up",
+								"south": "none",
+								"west": "none"
+							}
+						]
+					}
+				]
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_side_north_1_on",
+				"y": 270
+			}
+		},
+		{
+			"when": 
+			{
+				"north": "up",
+				"powered": false
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_up_off"
+			}
+		},
+		{
+			"when": 
+			{
+				"north": "up",
+				"powered": true
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_up_on"
+			}
+		},
+		{
+			"when": 
+			{
+				"east": "up",
+				"powered": false
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_up_off",
+				"y": 90
+			}
+		},
+		{
+			"when": 
+			{
+				"east": "up",
+				"powered": true
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_up_on",
+				"y": 90
+			}
+		},
+		{
+			"when": 
+			{
+				"south": "up",
+				"powered": false
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_up_off",
+				"y": 180
+			}
+		},
+		{
+			"when": 
+			{
+				"south": "up",
+				"powered": true
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_up_on",
+				"y": 180
+			}
+		},
+		{
+			"when": 
+			{
+				"west": "up",
+				"powered": false
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_up_off",
+				"y": 270
+			}
+		},
+		{
+			"when": 
+			{
+				"west": "up",
+				"powered": true
+			},
+			"apply": 
+			{
+				"model": "magus:block/wizard_grit_up_on",
+				"y": 270
+			}
+		}
+	]
+}
