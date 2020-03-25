@@ -35,8 +35,8 @@ public class WizardGritBlock extends Block
 	public WizardGritBlock(Properties properties)
 	{
 		super(properties);
-		this.setDefaultState(this.stateContainer.getBaseState().with(NORTH, RedstoneSide.NONE).with(EAST, RedstoneSide.NONE).with(SOUTH, RedstoneSide.NONE)
-			.with(WEST, RedstoneSide.NONE));
+		this.setDefaultState(
+			this.stateContainer.getBaseState().with(NORTH, RedstoneSide.NONE).with(EAST, RedstoneSide.NONE).with(SOUTH, RedstoneSide.NONE).with(WEST, RedstoneSide.NONE));
 	}
 
 	@Override
@@ -82,39 +82,39 @@ public class WizardGritBlock extends Block
 	 * the flags. The flags can be referenced from the docs for
 	 * {@link IWorldWriter#setBlockState(BlockState, BlockPos, int)}.
 	 */
-	@Override	// from redstone
-	public void updateDiagonalNeighbors(BlockState state, IWorld worldIn, BlockPos pos, int flags)
+	@Override
+	public void updateDiagonalNeighbors(BlockState state, IWorld world, BlockPos pos, int flags)
 	{
-		try (BlockPos.PooledMutable mutaPos = BlockPos.PooledMutable.retain())
-		{
-			for (Direction horizontalDir : Direction.Plane.HORIZONTAL)
-			{
-				RedstoneSide sideState = state.get(RedstoneWireBlock.FACING_PROPERTY_MAP.get(horizontalDir));
-				if (sideState != RedstoneSide.NONE && worldIn.getBlockState(mutaPos.setPos(pos).move(horizontalDir)).getBlock() != this)
-				{
-					mutaPos.move(Direction.DOWN);
-					BlockState stateBelowNeighbor = worldIn.getBlockState(mutaPos);
-					//if (blockstate.getBlock() != Blocks.OBSERVER)
-					//{
-					BlockPos posBelowHere = mutaPos.offset(horizontalDir.getOpposite());
-					BlockState newStateBelowNeighbor = stateBelowNeighbor.updatePostPlacement(horizontalDir.getOpposite(), worldIn.getBlockState(posBelowHere), worldIn, mutaPos,
-						posBelowHere);
-					replaceBlock(stateBelowNeighbor, newStateBelowNeighbor, worldIn, mutaPos, flags);
-					//}
+		super.updateDiagonalNeighbors(state, world, pos, flags);
+		WizardGritBlock.onWizardGritConnectorDiagonalNeighborUpdate(world, pos, flags);
+	}
 
-					mutaPos.setPos(pos).move(horizontalDir).move(Direction.UP);
-					BlockState stateAboveNeighbor = worldIn.getBlockState(mutaPos);
-//					if (stateAboveNeighbor.getBlock() != Blocks.OBSERVER)
-//					{
-					BlockPos stateAboveHere = mutaPos.offset(horizontalDir.getOpposite());
-					BlockState newStateAboveNeighbor = stateAboveNeighbor.updatePostPlacement(horizontalDir.getOpposite(), worldIn.getBlockState(stateAboveHere), worldIn, mutaPos,
-						stateAboveHere);
-					replaceBlock(stateAboveNeighbor, newStateAboveNeighbor, worldIn, mutaPos, flags);
-//					}
+	/**
+	 * blocks that wizard grid can connect to up the faces of blocks should call
+	 * this in updateDiagonalNeighbors
+	 **/
+	public static void onWizardGritConnectorDiagonalNeighborUpdate(IWorld world, BlockPos sourcePos, int flags)
+	{
+		try (BlockPos.PooledMutable mutablePos = BlockPos.PooledMutable.retain())
+		{
+			for (Direction horizontalDirection : Direction.Plane.HORIZONTAL)
+			{
+				for (Direction verticalDirection : Direction.Plane.VERTICAL)
+				{
+					mutablePos.setPos(sourcePos).move(horizontalDirection).move(verticalDirection);
+					BlockState oldDiagonalState = world.getBlockState(mutablePos);
+					if (BlockRegistrar.WIZARD_GRIT_CONNECTORS.contains(oldDiagonalState.getBlock()))
+					{
+						BlockPos targetPos = mutablePos.toImmutable();
+						Direction faceDirection = horizontalDirection.getOpposite();
+						BlockPos facePos = targetPos.offset(faceDirection);
+						// update the wizard grit as if updated by the block just above or below the caller
+						BlockState newDiagonalState = oldDiagonalState.updatePostPlacement(faceDirection, world.getBlockState(facePos), world, targetPos, facePos);
+						replaceBlock(oldDiagonalState, newDiagonalState, world, targetPos, flags);
+					}
 				}
 			}
 		}
-
 	}
 
 	// from redstone
@@ -151,110 +151,12 @@ public class WizardGritBlock extends Block
 		return floorState.isSolidSide(worldIn, floorPos, Direction.UP);
 	}
 
-	/**
-	 * Calls World.notifyNeighborsOfStateChange() for all neighboring blocks, but
-	 * only if the given block is the same block.
-	 */
-	private void notifySimilarNeighborsOfStateChange(World worldIn, BlockPos pos)
-	{
-		if (worldIn.getBlockState(pos).getBlock() == this)
-		{
-			worldIn.notifyNeighborsOfStateChange(pos, this);
-
-			for (Direction direction : Direction.values())
-			{
-				worldIn.notifyNeighborsOfStateChange(pos.offset(direction), this);
-			}
-
-		}
-	}
-
-	// from redstone
-	@Override
-	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving)
-	{
-		if (oldState.getBlock() != state.getBlock() && !worldIn.isRemote)
-		{
-			for (Direction direction : Direction.Plane.VERTICAL)
-			{
-				worldIn.notifyNeighborsOfStateChange(pos.offset(direction), this);
-			}
-
-			for (Direction direction1 : Direction.Plane.HORIZONTAL)
-			{
-				this.notifySimilarNeighborsOfStateChange(worldIn, pos.offset(direction1));
-			}
-
-			for (Direction direction2 : Direction.Plane.HORIZONTAL)
-			{
-				BlockPos blockpos = pos.offset(direction2);
-				if (worldIn.getBlockState(blockpos).isNormalCube(worldIn, blockpos))
-				{
-					this.notifySimilarNeighborsOfStateChange(worldIn, blockpos.up());
-				}
-				else
-				{
-					this.notifySimilarNeighborsOfStateChange(worldIn, blockpos.down());
-				}
-			}
-
-		}
-	}
-
-	// from redstone
-	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving)
-	{
-		if (!isMoving && state.getBlock() != newState.getBlock())
-		{
-			super.onReplaced(state, worldIn, pos, newState, isMoving);
-			if (!worldIn.isRemote)
-			{
-				for (Direction direction : Direction.values())
-				{
-					worldIn.notifyNeighborsOfStateChange(pos.offset(direction), this);
-				}
-
-				for (Direction direction1 : Direction.Plane.HORIZONTAL)
-				{
-					this.notifySimilarNeighborsOfStateChange(worldIn, pos.offset(direction1));
-				}
-
-				for (Direction direction2 : Direction.Plane.HORIZONTAL)
-				{
-					BlockPos blockpos = pos.offset(direction2);
-					if (worldIn.getBlockState(blockpos).isNormalCube(worldIn, blockpos))
-					{
-						this.notifySimilarNeighborsOfStateChange(worldIn, blockpos.up());
-					}
-					else
-					{
-						this.notifySimilarNeighborsOfStateChange(worldIn, blockpos.down());
-					}
-				}
-
-			}
-		}
-	}
-	
-	public static void onDiagonalConnectorUpdate(Block sourceBlock, BlockPos sourcePos, World world)
-	{
-		for (Direction verticalDir : Direction.Plane.VERTICAL)
-		{
-			world.notifyNeighborsOfStateChange(sourcePos.offset(verticalDir), sourceBlock);
-		}
-	}
-
 	@Override
 	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving)
 	{
 		if (!worldIn.isRemote)
 		{
-			if (state.isValidPosition(worldIn, pos))
-			{
-//				this.updateSurroundingRedstone(worldIn, pos, state);
-			}
-			else
+			if (!state.isValidPosition(worldIn, pos))
 			{
 				spawnDrops(state, worldIn, pos);
 				worldIn.removeBlock(pos, false);

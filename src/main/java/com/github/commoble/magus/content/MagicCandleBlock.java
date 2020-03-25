@@ -14,6 +14,7 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldWriter;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -43,6 +44,18 @@ public class MagicCandleBlock extends TorchBlock
 	}
 
 	/**
+	 * performs updates on diagonal neighbors of the target position and passes in
+	 * the flags. The flags can be referenced from the docs for
+	 * {@link IWorldWriter#setBlockState(BlockState, BlockPos, int)}.
+	 */
+	@Override
+	public void updateDiagonalNeighbors(BlockState state, IWorld world, BlockPos pos, int flags)
+	{
+		super.updateDiagonalNeighbors(state, world, pos, flags);
+		WizardGritBlock.onWizardGritConnectorDiagonalNeighborUpdate(world, pos, flags);
+	}
+
+	/**
 	 * Amount of light emitted
 	 * 
 	 * @deprecated prefer calling {@link BlockState#getLightValue()}
@@ -52,19 +65,6 @@ public class MagicCandleBlock extends TorchBlock
 	public int getLightValue(BlockState state)
 	{
 		return state.get(LIT) ? super.getLightValue(state) : 0;
-	}
-
-	/**
-	 * Any blocks that wizard grit can connect to need to override updateDiagonalNeighbors to help them connect 
-	 */
-	@Override
-	@Deprecated
-	public void updateDiagonalNeighbors(BlockState state, IWorld worldIn, BlockPos pos, int flags)
-	{
-		if (worldIn instanceof World)
-		{
-			WizardGritBlock.onDiagonalConnectorUpdate(state.getBlock(), pos, (World)worldIn);
-		}
 	}
 
 	@Override

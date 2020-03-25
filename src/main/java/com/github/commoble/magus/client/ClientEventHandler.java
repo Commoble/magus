@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -21,14 +20,8 @@ public class ClientEventHandler
 {
 	public static void subscribeClientEvents(IEventBus modBus, IEventBus forgeBus)
 	{
-		modBus.addListener(ClientEventHandler::onRegisterModels);
 		modBus.addListener(ClientEventHandler::onBakeModels);
 		modBus.addListener(ClientEventHandler::onClientSetup);
-	}
-
-	private static void onRegisterModels(ModelRegistryEvent event)
-	{
-		//ModelLoaderRegistry.registerLoader(new ResourceLocation(Magus.MODID, "fullbright_loader"), null);
 	}
 
 	private static void onBakeModels(ModelBakeEvent event)
@@ -58,15 +51,6 @@ public class ClientEventHandler
 			}
 		}
 	}
-
-//	private static void overrideBakedModel(Map<ResourceLocation, IBakedModel> modelRegistry, ResourceLocation existingLocation,
-//		BiFunction<Map<ResourceLocation, IBakedModel>, IBakedModel, IBakedModel> modelFactory)
-//	{
-//		if (existingResources.contains(existingLocation))
-//		{
-//			modelRegistry.put(existingLocation, modelFactory.apply(modelRegistry, modelRegistry.get(existingLocation)));
-//		}
-//	}
 
 	private static void onClientSetup(FMLClientSetupEvent event)
 	{
