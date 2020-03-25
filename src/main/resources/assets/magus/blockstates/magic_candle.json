@@ -22,23 +22,9 @@
 			}
 		},
 		{
-			"when": 
-			{
-				"powered": "true"
-			},
 			"apply": 
 			{
-				"model": "magus:block/wizard_grit_circle_on"
-			}
-		},
-		{
-			"when": 
-			{
-				"powered": "false"
-			},
-			"apply": 
-			{
-				"model": "magus:block/wizard_grit_circle_off"
+				"model": "magus:block/wizard_grit_circle"
 			}
 		}
 	]

@@ -13,6 +13,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -20,20 +21,19 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class MagicCandleBlock extends TorchBlock
 {
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
-	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 	public static final VoxelShape BASE_SHAPE = Block.makeCuboidShape(0, 0, 0, 16, 0.25D, 16);
 	public static final VoxelShape SHAPE = VoxelShapes.or(TorchBlock.SHAPE, BASE_SHAPE);
 
 	public MagicCandleBlock(Properties properties)
 	{
 		super(properties);
-		this.setDefaultState(this.stateContainer.getBaseState().with(LIT, true).with(POWERED, false));
+		this.setDefaultState(this.stateContainer.getBaseState().with(LIT, true));
 	}
 
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
 	{
-		builder.add(LIT, POWERED);
+		builder.add(LIT);
 	}
 
 	@Override
@@ -52,6 +52,19 @@ public class MagicCandleBlock extends TorchBlock
 	public int getLightValue(BlockState state)
 	{
 		return state.get(LIT) ? super.getLightValue(state) : 0;
+	}
+
+	/**
+	 * Any blocks that wizard grit can connect to need to override updateDiagonalNeighbors to help them connect 
+	 */
+	@Override
+	@Deprecated
+	public void updateDiagonalNeighbors(BlockState state, IWorld worldIn, BlockPos pos, int flags)
+	{
+		if (worldIn instanceof World)
+		{
+			WizardGritBlock.onDiagonalConnectorUpdate(state.getBlock(), pos, (World)worldIn);
+		}
 	}
 
 	@Override

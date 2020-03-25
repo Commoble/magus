@@ -2,6 +2,6 @@
 	"parent": "magus:block/wizard_grit_template",
 	"textures":
 	{
-        "texture": "magus:block/wizard_grit_dot_on"
+        "texture": "magus:block/wizard_grit_dot"
 	}
 }

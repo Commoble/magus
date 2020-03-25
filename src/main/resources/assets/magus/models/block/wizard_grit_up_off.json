@@ -1,6 +1,0 @@
-{
-    "parent": "magus:block/wizard_grit_up_template",
-    "textures": {
-        "texture": "magus:block/wizard_grit_line0_off"
-    }
-}

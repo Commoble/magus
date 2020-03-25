@@ -9,7 +9,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -32,13 +31,12 @@ public class WizardGritBlock extends Block
 	public static final EnumProperty<RedstoneSide> EAST = BlockStateProperties.REDSTONE_EAST;
 	public static final EnumProperty<RedstoneSide> SOUTH = BlockStateProperties.REDSTONE_SOUTH;
 	public static final EnumProperty<RedstoneSide> WEST = BlockStateProperties.REDSTONE_WEST;
-	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
 	public WizardGritBlock(Properties properties)
 	{
 		super(properties);
 		this.setDefaultState(this.stateContainer.getBaseState().with(NORTH, RedstoneSide.NONE).with(EAST, RedstoneSide.NONE).with(SOUTH, RedstoneSide.NONE)
-			.with(WEST, RedstoneSide.NONE).with(POWERED, false));
+			.with(WEST, RedstoneSide.NONE));
 	}
 
 	@Override
@@ -238,6 +236,14 @@ public class WizardGritBlock extends Block
 			}
 		}
 	}
+	
+	public static void onDiagonalConnectorUpdate(Block sourceBlock, BlockPos sourcePos, World world)
+	{
+		for (Direction verticalDir : Direction.Plane.VERTICAL)
+		{
+			world.notifyNeighborsOfStateChange(sourcePos.offset(verticalDir), sourceBlock);
+		}
+	}
 
 	@Override
 	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving)
@@ -311,6 +317,6 @@ public class WizardGritBlock extends Block
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
 	{
-		builder.add(NORTH, EAST, SOUTH, WEST, POWERED);
+		builder.add(NORTH, EAST, SOUTH, WEST);
 	}
 }

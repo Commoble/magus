@@ -1,6 +1,0 @@
-{
-    "parent": "magus:block/wizard_grit_side_north_template",
-    "textures": {
-        "texture": "magus:block/wizard_grit_line1_on"
-    }
-}
