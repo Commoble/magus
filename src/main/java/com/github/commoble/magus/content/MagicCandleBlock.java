@@ -70,7 +70,7 @@ public class MagicCandleBlock extends TorchBlock implements WizardGritConnection
 
 	@Override
 	public Set<BlockPos> getPotentialConnections(IBlockReader world, BlockPos thisPos)
-	{	
+	{
 		// return the north/south/east/west neighbors and down as well
 		return DirectionUtil.HORIZONTALS_AND_DOWN.stream().map(dir -> thisPos.offset(dir)).collect(Collectors.toSet());
 	}
