@@ -1,8 +1,12 @@
 package com.github.commoble.magus.content;
 
-import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.github.commoble.magus.BlockRegistrar;
+import com.github.commoble.magus.api.WizardGritConnectionProvider;
+import com.github.commoble.magus.api.WizardGritConnectors;
+import com.github.commoble.magus.api.WizardGritConnectors.PartialConnection;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -25,7 +29,7 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.IWorldWriter;
 import net.minecraft.world.World;
 
-public class WizardGritBlock extends Block
+public class WizardGritBlock extends Block implements WizardGritConnectionProvider
 {
 	public static final EnumProperty<RedstoneSide> NORTH = BlockStateProperties.REDSTONE_NORTH;
 	public static final EnumProperty<RedstoneSide> EAST = BlockStateProperties.REDSTONE_EAST;
@@ -40,6 +44,7 @@ public class WizardGritBlock extends Block
 	}
 
 	@Override
+	@Deprecated
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
 	{
 		return Blocks.REDSTONE_WIRE.getShape(state, worldIn, pos, context);
@@ -83,6 +88,7 @@ public class WizardGritBlock extends Block
 	 * {@link IWorldWriter#setBlockState(BlockState, BlockPos, int)}.
 	 */
 	@Override
+	@Deprecated
 	public void updateDiagonalNeighbors(BlockState state, IWorld world, BlockPos pos, int flags)
 	{
 		super.updateDiagonalNeighbors(state, world, pos, flags);
@@ -103,7 +109,7 @@ public class WizardGritBlock extends Block
 				{
 					mutablePos.setPos(sourcePos).move(horizontalDirection).move(verticalDirection);
 					BlockState oldDiagonalState = world.getBlockState(mutablePos);
-					if (BlockRegistrar.WIZARD_GRIT_CONNECTORS.contains(oldDiagonalState.getBlock()))
+					if (BlockRegistrar.WIZARD_GRIT_DIAGONAL_CONNECTORS.contains(oldDiagonalState.getBlock()))
 					{
 						BlockPos targetPos = mutablePos.toImmutable();
 						Direction faceDirection = horizontalDirection.getOpposite();
@@ -117,19 +123,24 @@ public class WizardGritBlock extends Block
 		}
 	}
 
-	// from redstone
-	private RedstoneSide getSide(IBlockReader worldIn, BlockPos pos, Direction face)
+	// based on redstone
+	private RedstoneSide getSide(IBlockReader world, BlockPos pos, Direction face)
 	{
-		BlockPos blockpos = pos.offset(face);
-		BlockState blockstate = worldIn.getBlockState(blockpos);
-		BlockPos blockpos1 = pos.up();
-		BlockState blockstate1 = worldIn.getBlockState(blockpos1);
-		if (!blockstate1.isNormalCube(worldIn, blockpos1))
+		BlockPos neighborPos = pos.offset(face);
+		BlockState neighborState = world.getBlockState(neighborPos);
+		BlockPos abovePos = pos.up();
+		BlockState aboveState = world.getBlockState(abovePos);
+		// this can be called in getStateForPlacement, before the block exists in the world
+		// so make sure we're using this specific block instance
+		PartialConnection connection = WizardGritConnectors.getPartialConnection(world, pos, this);
+		
+		if (!aboveState.isNormalCube(world, abovePos))
 		{
-			boolean flag = blockstate.isSolidSide(worldIn, blockpos, Direction.UP) || blockstate.getBlock() == Blocks.HOPPER;
-			if (flag && canConnectTo(worldIn.getBlockState(blockpos.up()), worldIn, blockpos.up(), null))
+			boolean flag = neighborState.isSolidSide(world, neighborPos, Direction.UP);
+			
+			if (flag && connection.isMutuallyConnectedTo(world, neighborPos.up()))
 			{
-				if (blockstate.isCollisionShapeOpaque(worldIn, blockpos))
+				if (neighborState.isCollisionShapeOpaque(world, neighborPos))
 				{
 					return RedstoneSide.UP;
 				}
@@ -138,8 +149,8 @@ public class WizardGritBlock extends Block
 			}
 		}
 
-		return !canConnectTo(blockstate, worldIn, blockpos, face)
-			&& (blockstate.isNormalCube(worldIn, blockpos) || !canConnectTo(worldIn.getBlockState(blockpos.down()), worldIn, blockpos.down(), null)) ? RedstoneSide.NONE
+		return !connection.isMutuallyConnectedTo(world, neighborPos)
+			&& (neighborState.isNormalCube(world, neighborPos) || !connection.isMutuallyConnectedTo(world, neighborPos.down())) ? RedstoneSide.NONE
 				: RedstoneSide.SIDE;
 	}
 
@@ -165,9 +176,47 @@ public class WizardGritBlock extends Block
 		}
 	}
 
-	protected static boolean canConnectTo(BlockState blockState, IBlockReader world, BlockPos pos, @Nullable Direction side)
+//	protected static boolean canConnectTo(BlockState blockState, IBlockReader world, BlockPos pos, @Nullable Direction side)
+//	{
+//		return BlockRegistrar.WIZARD_GRIT_CONNECTORS.contains(blockState.getBlock());
+//	}
+	
+	@Override
+	public Set<BlockPos> getPotentialConnections(IBlockReader world, BlockPos thisPos)
 	{
-		return BlockRegistrar.WIZARD_GRIT_CONNECTORS.contains(blockState.getBlock());
+		// we are allowed to connect to the following blocks:
+		// - the block directly below this one
+		// - any NSWE horizontal neighbors, unless they are air blocks
+		// - blocks that are directly below a horizontal-neighbor-that-is-an-air-block
+		// - blocks that are directly above a horizontal-neighbor-that-is-a-solid-cube, IF the block directly above this is not a solid cube
+		Set<BlockPos> connections = new HashSet<>();
+		connections.add(thisPos.down());
+		BlockPos abovePos = thisPos.up();
+		for (Direction horizontalDirection : Direction.Plane.HORIZONTAL)
+		{
+			BlockPos neighborPos = thisPos.offset(horizontalDirection);
+			BlockState neighborState = world.getBlockState(neighborPos);
+			
+			if (neighborState.isAir(world, neighborPos))
+			{
+				connections.add(neighborPos.down());
+			}
+			else
+			{
+				connections.add(neighborPos);
+
+				BlockState aboveState = world.getBlockState(abovePos);
+				if (!aboveState.isNormalCube(world, abovePos))
+				{
+					boolean neighborHasSolidTop = neighborState.isSolidSide(world, neighborPos, Direction.UP);
+					if (neighborHasSolidTop && neighborState.isCollisionShapeOpaque(world, neighborPos))
+					{
+						connections.add(neighborPos.up());
+					}
+				}
+			}
+		}
+		return connections;
 	}
 
 	/**

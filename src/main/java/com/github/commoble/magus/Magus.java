@@ -27,6 +27,8 @@ public class Magus
 			ItemRegistrar::registerRegistry,
 			EntityTypeRegistrar::registerRegistry);
 		
+		modBus.addListener(CommonModEvents::onCommonSetup);
+		
 		// use a layer of indirection when subscribing client events to avoid classloading client classes on server
 		DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> ClientEventHandler.subscribeClientEvents(modBus, forgeBus));
 	}

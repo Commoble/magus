@@ -1,6 +1,11 @@
 package com.github.commoble.magus.content;
 
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.github.commoble.magus.api.WizardGritConnectionProvider;
+import com.github.commoble.magus.util.DirectionUtil;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -13,13 +18,11 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldWriter;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class MagicCandleBlock extends TorchBlock
+public class MagicCandleBlock extends TorchBlock implements WizardGritConnectionProvider
 {
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 	public static final VoxelShape BASE_SHAPE = Block.makeCuboidShape(0, 0, 0, 16, 0.25D, 16);
@@ -44,18 +47,6 @@ public class MagicCandleBlock extends TorchBlock
 	}
 
 	/**
-	 * performs updates on diagonal neighbors of the target position and passes in
-	 * the flags. The flags can be referenced from the docs for
-	 * {@link IWorldWriter#setBlockState(BlockState, BlockPos, int)}.
-	 */
-	@Override
-	public void updateDiagonalNeighbors(BlockState state, IWorld world, BlockPos pos, int flags)
-	{
-		super.updateDiagonalNeighbors(state, world, pos, flags);
-		WizardGritBlock.onWizardGritConnectorDiagonalNeighborUpdate(world, pos, flags);
-	}
-
-	/**
 	 * Amount of light emitted
 	 * 
 	 * @deprecated prefer calling {@link BlockState#getLightValue()}
@@ -75,5 +66,12 @@ public class MagicCandleBlock extends TorchBlock
 		{
 			super.animateTick(stateIn, worldIn, pos, rand);
 		}
+	}
+
+	@Override
+	public Set<BlockPos> getPotentialConnections(IBlockReader world, BlockPos thisPos)
+	{	
+		// return the north/south/east/west neighbors and down as well
+		return DirectionUtil.HORIZONTALS_AND_DOWN.stream().map(dir -> thisPos.offset(dir)).collect(Collectors.toSet());
 	}
 }

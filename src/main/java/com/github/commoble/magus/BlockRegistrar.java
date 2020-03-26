@@ -27,6 +27,6 @@ public class BlockRegistrar
 	public static final RegistryObject<MagicCandleBlock> MAGIC_CANDLE = BLOCKS.register(ObjectNames.MAGIC_CANDLE, () ->
 		new MagicCandleBlock(Block.Properties.from(Blocks.TORCH)));
 	
-	// tags
-	public static final BlockTags.Wrapper WIZARD_GRIT_CONNECTORS = new BlockTags.Wrapper(new ResourceLocation(Magus.MODID, "wizard_grit_connectors"));
+	/** tag for blocks that can diagonally connect to wizard grit dust **/
+	public static final BlockTags.Wrapper WIZARD_GRIT_DIAGONAL_CONNECTORS = new BlockTags.Wrapper(new ResourceLocation(Magus.MODID, "wizard_grit_diagonal_connectors"));
 }
