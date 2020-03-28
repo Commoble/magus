@@ -6,8 +6,6 @@ import com.github.commoble.magus.content.WizardGritBlock;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -27,6 +25,4 @@ public class BlockRegistrar
 	public static final RegistryObject<MagicCandleBlock> MAGIC_CANDLE = BLOCKS.register(ObjectNames.MAGIC_CANDLE, () ->
 		new MagicCandleBlock(Block.Properties.from(Blocks.TORCH)));
 	
-	/** tag for blocks that can diagonally connect to wizard grit dust **/
-	public static final BlockTags.Wrapper WIZARD_GRIT_DIAGONAL_CONNECTORS = new BlockTags.Wrapper(new ResourceLocation(Magus.MODID, "wizard_grit_diagonal_connectors"));
 }

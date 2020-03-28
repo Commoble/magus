@@ -1,18 +1,21 @@
 package com.github.commoble.magus.content;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
-import com.github.commoble.magus.BlockRegistrar;
-import com.github.commoble.magus.api.WizardGritConnectionProvider;
-import com.github.commoble.magus.api.WizardGritConnectors;
-import com.github.commoble.magus.api.WizardGritConnectors.PartialConnection;
+import com.github.commoble.magus.BlockTagRegistrar;
+import com.github.commoble.magus.api.blocknetworks.BlockNetworkType;
+import com.github.commoble.magus.api.blocknetworks.BlockNetworks;
+import com.github.commoble.magus.api.blocknetworks.ConnectionProvider;
+import com.github.commoble.magus.api.blocknetworks.BlockNetworkType.PartialConnection;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -28,19 +31,26 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.IWorldWriter;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
-public class WizardGritBlock extends Block implements WizardGritConnectionProvider
+public class WizardGritBlock extends Block implements ConnectionProvider
 {
 	public static final EnumProperty<RedstoneSide> NORTH = BlockStateProperties.REDSTONE_NORTH;
 	public static final EnumProperty<RedstoneSide> EAST = BlockStateProperties.REDSTONE_EAST;
 	public static final EnumProperty<RedstoneSide> SOUTH = BlockStateProperties.REDSTONE_SOUTH;
 	public static final EnumProperty<RedstoneSide> WEST = BlockStateProperties.REDSTONE_WEST;
+	public static final BooleanProperty BURNT = BooleanProperty.create("burnt");
 
 	public WizardGritBlock(Properties properties)
 	{
 		super(properties);
-		this.setDefaultState(
-			this.stateContainer.getBaseState().with(NORTH, RedstoneSide.NONE).with(EAST, RedstoneSide.NONE).with(SOUTH, RedstoneSide.NONE).with(WEST, RedstoneSide.NONE));
+		this.setDefaultState(this.stateContainer.getBaseState().with(NORTH, RedstoneSide.NONE).with(EAST, RedstoneSide.NONE).with(SOUTH, RedstoneSide.NONE)
+			.with(WEST, RedstoneSide.NONE).with(BURNT, false));
+	}
+
+	public BlockNetworkType getNetworkType(BlockState state)
+	{
+		return isBurnt(state) ? BlockNetworks.BURNT_WIZARD_GRIT : BlockNetworks.WIZARD_GRIT;
 	}
 
 	@Override
@@ -53,10 +63,29 @@ public class WizardGritBlock extends Block implements WizardGritConnectionProvid
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context)
 	{
-		IBlockReader world = context.getWorld();
-		BlockPos blockpos = context.getPos();
-		return this.getDefaultState().with(WEST, this.getSide(world, blockpos, Direction.WEST)).with(EAST, this.getSide(world, blockpos, Direction.EAST))
-			.with(NORTH, this.getSide(world, blockpos, Direction.NORTH)).with(SOUTH, this.getSide(world, blockpos, Direction.SOUTH));
+		return this.getStateForPlacement(context.getWorld(), context.getPos());
+	}
+
+	public BlockState getStateForPlacement(IBlockReader world, BlockPos posPlacedIn)
+	{
+		return this.getDefaultState().with(WEST, this.getSide(world, posPlacedIn, Direction.WEST)).with(EAST, this.getSide(world, posPlacedIn, Direction.EAST))
+			.with(NORTH, this.getSide(world, posPlacedIn, Direction.NORTH)).with(SOUTH, this.getSide(world, posPlacedIn, Direction.SOUTH));
+	}
+
+	@Override
+	@Deprecated
+	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving)
+	{
+		super.onReplaced(state, world, pos, newState, isMoving);
+		if (isBurnt(state))
+		{
+			// list of adjacent burnt wizard grit;
+			for (BlockPos adjacentPos : BlockNetworks.BURNT_WIZARD_GRIT.getPartialConnection(world, pos, state).getPotentialConnections())
+			{
+				world.destroyBlock(adjacentPos, false);
+			}
+			
+		}
 	}
 
 	/**
@@ -69,6 +98,10 @@ public class WizardGritBlock extends Block implements WizardGritConnectionProvid
 	@Override
 	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos)
 	{
+		if (stateIn.get(BURNT))
+		{
+			return stateIn;
+		}
 		if (facing == Direction.DOWN)
 		{
 			return stateIn;
@@ -109,12 +142,13 @@ public class WizardGritBlock extends Block implements WizardGritConnectionProvid
 				{
 					mutablePos.setPos(sourcePos).move(horizontalDirection).move(verticalDirection);
 					BlockState oldDiagonalState = world.getBlockState(mutablePos);
-					if (BlockRegistrar.WIZARD_GRIT_DIAGONAL_CONNECTORS.contains(oldDiagonalState.getBlock()))
+					if (BlockTagRegistrar.WIZARD_GRIT_DIAGONAL_CONNECTORS.contains(oldDiagonalState.getBlock()))
 					{
 						BlockPos targetPos = mutablePos.toImmutable();
 						Direction faceDirection = horizontalDirection.getOpposite();
 						BlockPos facePos = targetPos.offset(faceDirection);
-						// update the wizard grit as if updated by the block just above or below the caller
+						// update the wizard grit as if updated by the block just above or below the
+						// caller
 						BlockState newDiagonalState = oldDiagonalState.updatePostPlacement(faceDirection, world.getBlockState(facePos), world, targetPos, facePos);
 						replaceBlock(oldDiagonalState, newDiagonalState, world, targetPos, flags);
 					}
@@ -126,18 +160,20 @@ public class WizardGritBlock extends Block implements WizardGritConnectionProvid
 	// based on redstone
 	private RedstoneSide getSide(IBlockReader world, BlockPos pos, Direction face)
 	{
+		BlockState thisState = world.getBlockState(pos);
 		BlockPos neighborPos = pos.offset(face);
 		BlockState neighborState = world.getBlockState(neighborPos);
 		BlockPos abovePos = pos.up();
 		BlockState aboveState = world.getBlockState(abovePos);
-		// this can be called in getStateForPlacement, before the block exists in the world
+		// this can be called in getStateForPlacement, before the block exists in the
+		// world
 		// so make sure we're using this specific block instance
-		PartialConnection connection = WizardGritConnectors.getPartialConnection(world, pos, this);
-		
+		PartialConnection connection = this.getNetworkType(thisState).getPartialConnection(world, pos, this.getDefaultState());
+
 		if (!aboveState.isNormalCube(world, abovePos))
 		{
 			boolean flag = neighborState.isSolidSide(world, neighborPos, Direction.UP);
-			
+
 			if (flag && connection.isMutuallyConnectedTo(world, neighborPos.up()))
 			{
 				if (neighborState.isCollisionShapeOpaque(world, neighborPos))
@@ -150,8 +186,7 @@ public class WizardGritBlock extends Block implements WizardGritConnectionProvid
 		}
 
 		return !connection.isMutuallyConnectedTo(world, neighborPos)
-			&& (neighborState.isNormalCube(world, neighborPos) || !connection.isMutuallyConnectedTo(world, neighborPos.down())) ? RedstoneSide.NONE
-				: RedstoneSide.SIDE;
+			&& (neighborState.isNormalCube(world, neighborPos) || !connection.isMutuallyConnectedTo(world, neighborPos.down())) ? RedstoneSide.NONE : RedstoneSide.SIDE;
 	}
 
 	@Override
@@ -160,6 +195,22 @@ public class WizardGritBlock extends Block implements WizardGritConnectionProvid
 		BlockPos floorPos = pos.down();
 		BlockState floorState = worldIn.getBlockState(floorPos);
 		return floorState.isSolidSide(worldIn, floorPos, Direction.UP);
+	}
+
+	/**
+	 * Performs a random tick on a block.
+	 */
+	@Override
+	@Deprecated
+	public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random)
+	{
+		super.randomTick(state, worldIn, pos, random);
+
+		// burned wizard grit dissipates naturally after a while
+		if (state.has(BURNT) && state.get(BURNT))
+		{
+			worldIn.removeBlock(pos, false);
+		}
 	}
 
 	@Override
@@ -176,11 +227,12 @@ public class WizardGritBlock extends Block implements WizardGritConnectionProvid
 		}
 	}
 
-//	protected static boolean canConnectTo(BlockState blockState, IBlockReader world, BlockPos pos, @Nullable Direction side)
-//	{
-//		return BlockRegistrar.WIZARD_GRIT_CONNECTORS.contains(blockState.getBlock());
-//	}
-	
+	// protected static boolean canConnectTo(BlockState blockState, IBlockReader
+	// world, BlockPos pos, @Nullable Direction side)
+	// {
+	// return BlockRegistrar.WIZARD_GRIT_CONNECTORS.contains(blockState.getBlock());
+	// }
+
 	@Override
 	public Set<BlockPos> getPotentialConnections(IBlockReader world, BlockPos thisPos)
 	{
@@ -188,7 +240,8 @@ public class WizardGritBlock extends Block implements WizardGritConnectionProvid
 		// - the block directly below this one
 		// - any NSWE horizontal neighbors, unless they are air blocks
 		// - blocks that are directly below a horizontal-neighbor-that-is-an-air-block
-		// - blocks that are directly above a horizontal-neighbor-that-is-a-solid-cube, IF the block directly above this is not a solid cube
+		// - blocks that are directly above a horizontal-neighbor-that-is-a-solid-cube,
+		// IF the block directly above this is not a solid cube
 		Set<BlockPos> connections = new HashSet<>();
 		connections.add(thisPos.down());
 		BlockPos abovePos = thisPos.up();
@@ -196,7 +249,7 @@ public class WizardGritBlock extends Block implements WizardGritConnectionProvid
 		{
 			BlockPos neighborPos = thisPos.offset(horizontalDirection);
 			BlockState neighborState = world.getBlockState(neighborPos);
-			
+
 			if (neighborState.isAir(world, neighborPos))
 			{
 				connections.add(neighborPos.down());
@@ -268,6 +321,16 @@ public class WizardGritBlock extends Block implements WizardGritConnectionProvid
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
 	{
-		builder.add(NORTH, EAST, SOUTH, WEST);
+		builder.add(NORTH, EAST, SOUTH, WEST, BURNT);
+	}
+
+	public static boolean isNotBurnt(BlockState state)
+	{
+		return state.has(BURNT) && !state.get(BURNT);
+	}
+
+	public static boolean isBurnt(BlockState state)
+	{
+		return state.has(BURNT) && state.get(BURNT);
 	}
 }

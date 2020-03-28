@@ -20,12 +20,6 @@
 			{
 				"model": "magus:block/magic_candle_off"
 			}
-		},
-		{
-			"apply": 
-			{
-				"model": "magus:block/wizard_grit_circle"
-			}
 		}
 	]
 }

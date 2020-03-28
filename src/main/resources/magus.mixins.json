@@ -1,0 +1,18 @@
+{
+	"required": true,
+	"package": "com.github.commoble.magus.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"refmap": "magus.refmap.json",
+	"mixins": 
+	[
+		"BellTileEntityMixin"
+	],
+	"client": 
+	[
+	],
+	"injectors": 
+	{
+		"defaultRequire": 1
+	},
+	"minVersion": "0.8"
+}

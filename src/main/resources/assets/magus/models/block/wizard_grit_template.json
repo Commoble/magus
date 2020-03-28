@@ -8,7 +8,7 @@
             "to": [ 16, 0.25, 16 ],
             "shade": false,
             "faces": {
-                "up": { "uv": [ 0, 0, 16, 16], "texture": "#texture"}
+                "up": { "uv": [ 0, 0, 16, 16], "texture": "#texture", "tintindex": 0}
             }
         }
     ]
