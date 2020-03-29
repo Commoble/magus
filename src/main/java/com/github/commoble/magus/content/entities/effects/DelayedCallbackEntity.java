@@ -1,6 +1,7 @@
-package com.github.commoble.magus.content;
+package com.github.commoble.magus.content.entities.effects;
 
-import com.github.commoble.magus.api.serializablefunctions.CallbackRegistries;
+import com.github.commoble.magus.api.serializablefunctions.CallbackFactory;
+import com.github.commoble.magus.api.serializablefunctions.CallbackUtil;
 import com.github.commoble.magus.api.serializablefunctions.NoCallback;
 import com.github.commoble.magus.api.serializablefunctions.SerializableCallback;
 
@@ -27,8 +28,17 @@ public class DelayedCallbackEntity extends TemporaryEffectEntity
 	{
 		super(type, world);
 		this.duration = maxDuration;
-		this.callback = CallbackRegistries.CALLBACKS.createCallback(callbackKey, extraData);
+		this.callback = CallbackUtil.createCallback(callbackKey, extraData);
 	}
+	
+	public DelayedCallbackEntity(EntityType<?> type, World world, int maxDuration, CallbackFactory factory, CompoundNBT extraData)
+	{
+		super(type, world);
+		this.duration = maxDuration;
+		this.callback = factory.apply(extraData);
+	}
+	
+	
 
 	@Override
 	public int getMaxAge()
@@ -39,7 +49,7 @@ public class DelayedCallbackEntity extends TemporaryEffectEntity
 	@Override
 	public boolean doTickBehaviorAndShouldContinue()
 	{
-		this.callback.accept(this.world, this.getPosition());
+		this.callback.accept(this.world, this.getPositionVec());
 		return true;
 	}
 
@@ -48,7 +58,7 @@ public class DelayedCallbackEntity extends TemporaryEffectEntity
 	{
 		super.readAdditional(compound);
 		this.duration = compound.getInt(DURATION);
-		this.callback = CallbackRegistries.CALLBACKS.deserialize(compound.getCompound(CALLBACK));
+		this.callback = CallbackUtil.deserialize(compound.getCompound(CALLBACK));
 	}
 
 	@Override

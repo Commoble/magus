@@ -1,4 +1,4 @@
-package com.github.commoble.magus.content;
+package com.github.commoble.magus.content.entities.effects;
 
 import net.minecraft.entity.EntityPredicate;
 import net.minecraft.entity.EntityType;

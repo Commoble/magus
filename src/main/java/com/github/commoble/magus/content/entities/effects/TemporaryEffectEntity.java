@@ -1,4 +1,4 @@
-package com.github.commoble.magus.content;
+package com.github.commoble.magus.content.entities.effects;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
@@ -13,38 +13,45 @@ import net.minecraftforge.fml.network.NetworkHooks;
 public abstract class TemporaryEffectEntity extends Entity
 {
 	public static final String AGE = "age";
-	
+
 	private int ticksExisted = 0;
-	
+
 	public TemporaryEffectEntity(EntityType<?> entityTypeIn, World worldIn)
 	{
 		super(entityTypeIn, worldIn);
 	}
-	
+
 	@Override
 	public void tick()
 	{
 		this.ticksExisted++;
 		if (this.ticksExisted++ > this.getMaxAge() || !this.doTickBehaviorAndShouldContinue())
 		{
-			this.onRemove();
+			this.onEffectTimeout();
 			this.remove();
 		}
 	}
-	
+
+	@Override
+	protected int getPermissionLevel()
+	{
+		// return 0;
+		return 2;	// set oplevel to 2 so we can run commands from this entity
+	}
+
 	public abstract int getMaxAge();
-	
+
 	public int getTicksExisted()
 	{
 		return this.ticksExisted;
 	}
-	
+
 	/** override this to perform an action just before the entity effect ends **/
-	public void onRemove()
+	public void onEffectTimeout()
 	{
-		
+
 	}
-	
+
 	/** return false if entity should die immediately **/
 	public abstract boolean doTickBehaviorAndShouldContinue();
 

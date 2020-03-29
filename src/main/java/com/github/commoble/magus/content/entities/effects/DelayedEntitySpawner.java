@@ -1,4 +1,4 @@
-package com.github.commoble.magus.content;
+package com.github.commoble.magus.content.entities.effects;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -41,7 +41,7 @@ public class DelayedEntitySpawner extends TemporaryEffectEntity
 	
 	/** override this to perform an action just before the entity effect ends **/
 	@Override
-	public void onRemove()
+	public void onEffectTimeout()
 	{
 		Entity entity = this.typeToSpawn.create(this.world);
 		entity.copyLocationAndAnglesFrom(this);
