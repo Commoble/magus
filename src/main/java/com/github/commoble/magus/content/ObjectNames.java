@@ -12,6 +12,8 @@ public class ObjectNames
 	
 	// entities
 	public static final String UNRELENTING_CUBE = "unrelenting_cube";
-	public static final String BEE_SPAWNER = "bee_spawner";
+	public static final String BEE_SPAWNER = "bee_swarm";
 	public static final String DELAYED_ENTITY_SPAWNER = "delayed_entity_spawner";
+	public static final String DELAYED_CALLBACK_EFFECT = "delayed_callback";
+	public static final String DELAYED_COMMAND = "delayed_command";
 }

@@ -1,6 +1,7 @@
-package com.github.commoble.magus.content;
+package com.github.commoble.magus.content.entities;
 
 import com.github.commoble.magus.EntityTypeRegistrar;
+import com.github.commoble.magus.content.ObjectNames;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;

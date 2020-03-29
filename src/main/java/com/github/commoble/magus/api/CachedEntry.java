@@ -2,27 +2,34 @@ package com.github.commoble.magus.api;
 
 import java.util.function.Supplier;
 
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
+
 /**
- * RegistryObject-like delegate for non-forge registries. Gets the object from the given map the first time it's called.
- * 
- * TODO write things to update-cache-on-registry-replacement.
- * This shouldn't be a problem before then as long as nobody calls get() until after all things are registered.
+ * RegistryObject-like entry for use with custom forge registries that don't work with DeferredRegisters
+ * Registry-replacement should be safe, but accessing this before registry concludes is not!
  */
-public abstract class CachedEntry<V> implements Supplier<V>
+public class CachedEntry<T extends IForgeRegistryEntry<T>> implements Supplier<T>
 {
-	protected V value = null;
+	private final ResourceLocation id;
+	private final IForgeRegistry<T> registry;
 	
-	protected abstract V getNewValue();
+	private T cachedObject = null;
+	
+	public CachedEntry(ResourceLocation id, IForgeRegistry<T> registry)
+	{
+		this.id = id;
+		this.registry = registry;
+	}
 
 	@Override
-	public V get()
+	public T get()
 	{
-		if (this.value == null)
+		if (this.cachedObject == null)
 		{
-			this.value = this.getNewValue();
+			this.cachedObject = this.registry.getValue(this.id);
 		}
-		return this.value;
+		return this.cachedObject;
 	}
-	
-	
 }

@@ -3,14 +3,14 @@ package com.github.commoble.magus.content;
 import com.github.commoble.magus.EntityTypeRegistrar;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
-/** Defines the miscellanous SimpleCallbacks registered to CallbackRegistries**/
+/** Defines the miscellanous SimpleCallbacks registered to the callback registry**/
 public class SimpleCallbacks
 {
-	public static void ejectBeesFromEntity(World world, BlockPos pos)
+	public static void ejectBeesFromEntity(World world, Vec3d pos)
 	{
 		if (world instanceof ServerWorld)
 		{

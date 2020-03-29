@@ -2,6 +2,9 @@ package com.github.commoble.magus;
 
 import java.util.function.Consumer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.github.commoble.magus.client.ClientConfig;
 import com.github.commoble.magus.client.ClientEventHandler;
 
@@ -21,6 +24,8 @@ public class Magus
 	
 	public static ClientConfig clientConfig;
 	
+	public static final Logger LOGGER = LogManager.getLogger();
+	
 	public Magus()
 	{
 		IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -31,7 +36,8 @@ public class Magus
 			ItemRegistrar::registerRegistry,
 			EntityTypeRegistrar::registerRegistry);
 		
-		modBus.addListener(CommonModEvents::onCommonSetup);
+		CommonModEvents.subscribeEvents(modBus);
+		CommonForgeEvents.subscribeEvents(forgeBus);
 		
 		clientConfig = ConfigHelper.register(ModConfig.Type.CLIENT, ClientConfig::new);
 		

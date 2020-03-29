@@ -1,10 +1,13 @@
-package com.github.commoble.magus.api.serializablefunctions;
+package com.github.commoble.magus.content.callbacks;
+
+import com.github.commoble.magus.api.serializablefunctions.SerializableCallback;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -50,9 +53,9 @@ public class SpawnEntityCallback extends SerializableCallback
 	}
 
 	@Override
-	public void accept(World world, BlockPos pos)
+	public void accept(World world, Vec3d pos)
 	{
-		this.typeToSpawn.spawn(world, this.entityData, null, null, pos, SpawnReason.EVENT, false, false);
+		this.typeToSpawn.spawn(world, this.entityData, null, null, new BlockPos(pos), SpawnReason.EVENT, false, false);
 	}
 
 }

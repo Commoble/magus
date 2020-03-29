@@ -1,5 +1,7 @@
 package com.github.commoble.magus.content;
 
+import com.github.commoble.magus.content.entities.UnrelentingCubeEntity;
+
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

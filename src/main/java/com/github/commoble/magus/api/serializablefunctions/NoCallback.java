@@ -2,7 +2,7 @@ package com.github.commoble.magus.api.serializablefunctions;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public final class NoCallback extends SerializableCallback
@@ -33,7 +33,7 @@ public final class NoCallback extends SerializableCallback
 	}
 
 	@Override
-	public void accept(World world, BlockPos pos)
+	public void accept(World world, Vec3d pos)
 	{
 		// NOPE
 	}

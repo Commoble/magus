@@ -1,4 +1,4 @@
-package com.github.commoble.magus.content;
+package com.github.commoble.magus.content.entities;
 
 import java.util.function.Predicate;
 

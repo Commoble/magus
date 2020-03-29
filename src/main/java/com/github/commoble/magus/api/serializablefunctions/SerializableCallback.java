@@ -6,11 +6,11 @@ import javax.annotation.Nonnull;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 /** Interface for storing callbacks in entities n' things that can be performed later **/
-public abstract class SerializableCallback implements BiConsumer<World, BlockPos>
+public abstract class SerializableCallback implements BiConsumer<World, Vec3d>
 {
 	private final ResourceLocation id;
 	
@@ -31,8 +31,8 @@ public abstract class SerializableCallback implements BiConsumer<World, BlockPos
 	public CompoundNBT serialize()
 	{
 		CompoundNBT out = new CompoundNBT();
-		out.putString(CallbackRegistry.TYPE, this.getRegistryName().toString());
-		out.put(CallbackRegistry.DATA, this.serializeExtraData());
+		out.putString(CallbackUtil.TYPE, this.getRegistryName().toString());
+		out.put(CallbackUtil.DATA, this.serializeExtraData());
 		return out;
 	}
 
@@ -42,7 +42,7 @@ public abstract class SerializableCallback implements BiConsumer<World, BlockPos
 	public abstract void deserializeExtraData(CompoundNBT extraData);
 
 	@Override
-	public abstract void accept(World world, BlockPos pos);
+	public abstract void accept(World world, Vec3d pos);
 
 
 }

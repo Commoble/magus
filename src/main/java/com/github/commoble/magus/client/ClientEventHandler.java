@@ -80,5 +80,6 @@ public class ClientEventHandler
 		RenderTypeLookup.setRenderLayer(BlockRegistrar.WIZARD_GRIT.get(), RenderType.getCutout());
 		RenderingRegistry.registerEntityRenderingHandler(EntityTypeRegistrar.UNRELENTING_CUBE.get(), UnrelentingCubeEntityRenderer::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityTypeRegistrar.BEE_SPAWNER.get(), InvisibleEntityRenderer::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityTypeRegistrar.DELAYED_COMMAND_ENTITY.get(), InvisibleEntityRenderer::new);
 	}
 }

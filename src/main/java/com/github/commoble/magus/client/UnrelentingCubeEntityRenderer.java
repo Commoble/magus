@@ -1,7 +1,7 @@
 package com.github.commoble.magus.client;
 
 import com.github.commoble.magus.Magus;
-import com.github.commoble.magus.content.UnrelentingCubeEntity;
+import com.github.commoble.magus.content.entities.UnrelentingCubeEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
