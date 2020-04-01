@@ -9,7 +9,6 @@ public class ObjectNames
 	
 	// items, excluding blockitems
 	public static final String DEBUG_WAND = "debug_wand"; 
-	public static final String LORE_BOOK = "lore_book";
 	
 	// entities
 	public static final String UNRELENTING_CUBE = "unrelenting_cube";

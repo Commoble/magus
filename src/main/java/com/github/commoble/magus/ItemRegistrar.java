@@ -2,7 +2,6 @@ package com.github.commoble.magus;
 
 import com.github.commoble.magus.content.CreativeTabs;
 import com.github.commoble.magus.content.DebugWandItem;
-import com.github.commoble.magus.content.LoreBookItem;
 import com.github.commoble.magus.content.ObjectNames;
 
 import net.minecraft.item.BlockItem;
@@ -28,6 +27,4 @@ public class ItemRegistrar
 	
 	public static final RegistryObject<DebugWandItem> DEBUG_WAND = ITEMS.register(ObjectNames.DEBUG_WAND, () -> 
 		new DebugWandItem(new Item.Properties().group(CreativeTabs.MAGUS_ITEMS)));
-	public static final RegistryObject<LoreBookItem> LORE_BOOK = ITEMS.register(ObjectNames.LORE_BOOK, () ->
-		new LoreBookItem(new Item.Properties().group(CreativeTabs.MAGUS_BOOKS)));
 }

@@ -4,8 +4,6 @@ import com.github.commoble.magus.api.ModRegistries;
 import com.github.commoble.magus.api.blocknetworks.BlockNetworks;
 import com.github.commoble.magus.api.serializablefunctions.CallbackFactory;
 import com.github.commoble.magus.content.WizardGritBlock;
-import com.github.commoble.magus.network.OpenLoreBookS2CPacket;
-import com.github.commoble.magus.network.PacketHandler;
 
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -32,15 +30,7 @@ public class CommonModEvents
 	}
 	
 	public static void onCommonSetup(FMLCommonSetupEvent event)
-	{
-		// register packets
-		int packetID = 0;
-		PacketHandler.INSTANCE.registerMessage(packetID++,
-			OpenLoreBookS2CPacket.class,
-			OpenLoreBookS2CPacket::write,
-			OpenLoreBookS2CPacket::new,
-			OpenLoreBookS2CPacket::handle);
-		
+	{		
 		BlockNetworks.WIZARD_GRIT.registerBlockAsItself(BlockRegistrar.WIZARD_GRIT.get(), WizardGritBlock::isNotBurnt);
 		BlockNetworks.WIZARD_GRIT.registerBlockAsItself(BlockRegistrar.MAGIC_CANDLE.get());
 		
