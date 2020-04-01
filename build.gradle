@@ -3,7 +3,7 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
-        maven {url='https://dist.creeper.host/Sponge/maven'}
+        maven {url='https://dist.creeper.host/Sponge/maven'}	// mixin
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
@@ -102,7 +102,7 @@ repositories{
         url = "https://modmaven.k-4u.nl"
     }
 	**/
-    maven {url='https://dist.creeper.host/Sponge/maven'}
+    maven {url='https://dist.creeper.host/Sponge/maven'}	//mixin
 
     jcenter()
     mavenCentral()

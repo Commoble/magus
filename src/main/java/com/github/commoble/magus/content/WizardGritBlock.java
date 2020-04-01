@@ -6,9 +6,9 @@ import java.util.Set;
 
 import com.github.commoble.magus.BlockTagRegistrar;
 import com.github.commoble.magus.api.blocknetworks.BlockNetworkType;
+import com.github.commoble.magus.api.blocknetworks.BlockNetworkType.PartialConnection;
 import com.github.commoble.magus.api.blocknetworks.BlockNetworks;
 import com.github.commoble.magus.api.blocknetworks.ConnectionProvider;
-import com.github.commoble.magus.api.blocknetworks.BlockNetworkType.PartialConnection;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

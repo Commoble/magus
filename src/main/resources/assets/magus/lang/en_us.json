@@ -1,7 +1,10 @@
 {
 	"itemGroup.magus": "MAGUS",
+	"itemGroup.magus.books": "Tomes of the MAGUS",
 	
 	"block.magus.magic_candle": "Magic Candle",
 	"block.magus.wizard_grit": "Wizard Grit",
-	"block.magus.burnt_wizard_grit": "Burnt Wizard Grit"
+	"block.magus.burnt_wizard_grit": "Burnt Wizard Grit",
+	
+	"item.magus.lore_book": "Grimoire of Testing"
 }
