@@ -1,7 +1,7 @@
 package com.github.commoble.magus.client;
 
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.github.commoble.magus.BlockRegistrar;
@@ -48,7 +48,7 @@ public class ClientEventHandler
 		// we need to use existing models to create our enhanced models, so we'll need to make sure they're in the registry first and get them
 		// let's make a reusable model override function
 		// the resourcelocations we specify in the FullbrightBakedModel constructor are *texture* locations
-		BiConsumer<ModelResourceLocation, Map<ResourceLocation, IBakedModel>> wizardGritOverrider = getModelOverrider(baseModel ->
+		Consumer<ModelResourceLocation> overrideWizardGritModel = getModelOverrider(modelRegistry, baseModel ->
 			new FullbrightBakedModel(baseModel,
 				 new ResourceLocation("magus:block/wizard_grit_line0"),
 				 new ResourceLocation("magus:block/wizard_grit_line1"),
@@ -60,16 +60,16 @@ public class ClientEventHandler
 		BlockRegistrar.WIZARD_GRIT.get().getStateContainer().getValidStates().stream()
 			.filter(state -> !state.get(WizardGritBlock.BURNT))
 			.map(BlockModelShapes::getModelLocation)
-			.forEach(modelResourceLocation -> wizardGritOverrider.accept(modelResourceLocation, modelRegistry));
+			.forEach(overrideWizardGritModel);
 	}
 
-	public static BiConsumer<ModelResourceLocation, Map<ResourceLocation, IBakedModel>> getModelOverrider(Function<IBakedModel, IBakedModel> modelFunction)
+	public static Consumer<ModelResourceLocation> getModelOverrider(Map<ResourceLocation, IBakedModel> registry, Function<IBakedModel, IBakedModel> modelFunction)
 	{
-		return (mrl, registry) ->
+		return key ->
 		{
-			if (registry.containsKey(mrl))
+			if (registry.containsKey(key))
 			{
-				registry.put(mrl, modelFunction.apply(registry.get(mrl)));
+				registry.put(key, modelFunction.apply(registry.get(key)));
 			}
 		};
 	}
